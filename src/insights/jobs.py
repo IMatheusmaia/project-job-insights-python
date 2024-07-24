@@ -1,5 +1,5 @@
 import csv
-from typing import List, Dict, Union
+from typing import List, Dict
 
 
 class ProcessJobs:
@@ -18,18 +18,19 @@ class ProcessJobs:
                 job_types.add(job['job_type'])
         return list(job_types)
 
-    def filter_by_multiple_criteria(self, jobs: List[Dict], filter_criteria: Dict[str, str]) -> List[Dict]:
+    def filter_by_multiple_criteria(
+        self, jobs: List[Dict], filter_criteria: Dict[str, str]
+    ) -> List[Dict]:
         if not isinstance(filter_criteria, dict):
             raise TypeError("filter_criteria must be a dictionary")
 
-        matching_jobs = []
-        for job in jobs:
-            match = True
-            for criterion, value in filter_criteria.items():
-                if job.get(criterion) != value:
-                    match = False
-                    break
-            if match:
-                matching_jobs.append(job)
+        return [job for job in jobs
+                if self._matches_criteria(job, filter_criteria)]
 
-        return matching_jobs
+    def _matches_criteria(
+            self, job: Dict[str, str],
+            filter_criteria: Dict[str, str]) -> bool:
+        for criterion, value in filter_criteria.items():
+            if job.get(criterion) != value:
+                return False
+        return True
